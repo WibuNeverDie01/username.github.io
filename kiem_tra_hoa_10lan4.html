@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ĐỀ THI GIỮA KÌ I - HÓA HỌC 10 - THPT TRẦN QUÝ CÁP</title>
+<style>
+  :root {
+    --primary: #0284c7;
+    --primary-dark: #0369a1;
+    --text-main: #0f172a;
+    --bg-correct: #dcfce7;
+    --border-correct: #16a34a;
+    --bg-wrong: #fee2e2;
+    --border-wrong: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #cbd5e1;
+    color: var(--text-main);
+    margin: 0;
+    padding: 15px 8px;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  /* MODAL NHẬP TÊN BAN ĐẦU */
+  #modal-login {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 15px;
+  }
+  .login-box {
+    background: #fff;
+    width: 100%;
+    max-width: 460px;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    border-top: 6px solid var(--primary);
+  }
+  .login-box h2 {
+    margin: 0 0 5px 0;
+    font-size: 21px;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .login-input {
+    width: 100%;
+    padding: 11px 13px;
+    margin: 8px 0 15px 0;
+    font-size: 16px;
+    border: 1px solid #94a3b8;
+    border-radius: 5px;
+    font-family: inherit;
+  }
+  .btn-enter {
+    background: var(--primary);
+    color: #fff;
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .btn-enter:hover { background: var(--primary-dark); }
+
+  /* BÀI THI TRÊN GIẤY */
+  #exam-sheet {
+    max-width: 930px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 35px 45px;
+    border: 1px solid #94a3b8;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  }
+  @media (max-width: 600px) {
+    #exam-sheet { padding: 18px 12px; }
+  }
+
+  /* KHUNG TIÊU ĐỀ */
+  .exam-header {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    border-bottom: 2px solid #000;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+  }
+  .hdr-left {
+    text-align: center;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .hdr-left span { font-weight: normal; font-size: 13px; text-transform: none; display: block; }
+  .hdr-right { text-align: center; }
+  .hdr-right .title { font-size: 15.5px; font-weight: bold; text-transform: uppercase; }
+  .hdr-right .sub { font-size: 13.5px; font-style: italic; }
+
+  /* THANH THÔNG TIN THÍ SINH */
+  .student-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px dashed #475569;
+    padding: 8px 15px;
+    margin-bottom: 22px;
+    font-weight: bold;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .countdown { color: #dc2626; font-size: 17.5px; }
+
+  /* PHÂN MỤC */
+  .section-hdr {
+    background: #f1f5f9;
+    padding: 8px 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-left: 5px solid var(--primary);
+    margin: 25px 0 15px;
+    font-size: 15.5px;
+  }
+
+  /* CÂU HỎI */
+  .q-box { margin-bottom: 20px; }
+  .q-title { font-weight: bold; text-align: justify; margin-bottom: 8px; }
+
+  /* PHẦN I: TRẮC NGHIỆM ĐƠN */
+  .mcq-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+  @media (max-width: 650px) {
+    .mcq-options { grid-template-columns: 1fr; }
+  }
+  .mcq-item {
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    padding: 9px 12px;
+    background: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    transition: 0.15s;
+  }
+  .mcq-item:hover { background: #e2e8f0; }
+  .mcq-item.selected {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    font-weight: bold;
+  }
+
+  /* PHẦN II: ĐÚNG / SAI */
+  .passage-box {
+    background: #f8fafc;
+    border-left: 3px solid #64748b;
+    padding: 10px 14px;
+    font-style: italic;
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+  .tf-table { width: 100%; border-collapse: collapse; }
+  .tf-table th, .tf-table td { border: 1px solid #94a3b8; padding: 8px 10px; }
+  .tf-table th { background: #f1f5f9; text-align: center; font-weight: bold; }
+  .tf-btn-group { display: flex; justify-content: center; gap: 6px; }
+  .tf-btn {
+    padding: 6px 14px;
+    border: 1px solid #94a3b8;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+    user-select: none;
+  }
+  .tf-btn.active-d { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .tf-btn.active-s { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+  /* PHẦN III: TRẢ LỜI NGẮN */
+  .sa-input {
+    padding: 8px 12px;
+    width: 260px;
+    font-size: 16px;
+    border: 1px solid #94a3b8;
+    border-radius: 5px;
+    font-family: inherit;
+    margin-top: 5px;
+  }
+  .sa-ans-show { margin-top: 6px; font-weight: bold; display: none; }
+
+  /* NÚT BẤM & KẾT QUẢ */
+  .btn-submit {
+    display: block;
+    margin: 35px auto 10px;
+    background: #15803d;
+    color: #fff;
+    font-size: 19px;
+    font-weight: bold;
+    padding: 14px 45px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  .btn-submit:hover { background: #166534; }
+  #score-board {
+    display: none;
+    background: #f0f9ff;
+    border: 2px solid var(--primary);
+    padding: 22px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .score-badge { font-size: 34px; font-weight: bold; color: var(--primary-dark); margin: 6px 0; }
+  .btn-restart {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 1. POPUP NHẬP THÔNG TIN -->
+<div id="modal-login">
+  <div class="login-box">
+    <h2>Kiểm Tra Giữa Học Kỳ I</h2>
+    <div style="font-size: 15px; color:#475569; margin-bottom: 15px;">
+      Môn: <b>HÓA HỌC 10</b> | Thời gian: <b>45 phút</b><br>
+      <i>(100% Trắc nghiệm khách quan - Chấm điểm tự động)</i>
+    </div>
+    <div style="text-align: left;">
+      <label><b>Họ và tên thí sinh:</b> <span style="color:red">*</span></label>
+      <input type="text" id="txtName" class="login-input" placeholder="Nhập họ và tên..." autofocus>
+      <label><b>Lớp:</b></label>
+      <input type="text" id="txtClass" class="login-input" placeholder="Ví dụ: 10/1 hoặc 10A2">
+    </div>
+    <button class="btn-enter" onclick="startExam()">Vào Làm Bài Thi</button>
+  </div>
+</div>
+
+<!-- 2. BÀI THI CHÍNH THỨC -->
+<div id="exam-sheet">
+  
+  <div class="exam-header">
+    <div class="hdr-left">
+      SỞ GD&ĐT TP ĐÀ NẴNG<br>
+      <b>TRƯỜNG THPT TRẦN QUÝ CÁP</b><br>
+      <b>TỔ: LÍ - HÓA - SINH</b>
+      <span>----------------</span>
+    </div>
+    <div class="hdr-right">
+      <div class="title">ĐỀ KIỂM TRA GIỮA KÌ I - LỚP 10</div>
+      <div class="sub">NĂM HỌC 2026 - 2027 | MÔN: HÓA HỌC</div>
+      <div class="sub">Thời gian: 45 phút | Mã đề: <b id="lblExamCode">503</b></div>
+    </div>
+  </div>
+
+  <div class="student-strip">
+    <div>Học sinh: <span id="dspName" style="color:var(--primary-dark)">...</span> | Lớp: <span id="dspClass">...</span></div>
+    <div class="countdown">⏱ Còn lại: <span id="dspTimer">45:00</span></div>
+  </div>
+
+  <div id="score-board">
+    <h3 style="margin: 0; text-transform: uppercase;">KẾT QUẢ ĐÁNH GIÁ BÀI LÀM</h3>
+    <div class="score-badge" id="dspScore">0.00 / 10.0 ĐIỂM</div>
+    <div id="dspDetail" style="font-size: 15.5px; color:#334155; margin-bottom: 8px;"></div>
+    <div id="dspComment" style="font-weight: bold; font-size: 16.5px;"></div>
+    <button class="btn-restart" onclick="makeNewExam()">Tạo Đề Mới Ngẫu Nhiên</button>
+  </div>
+
+  <div id="questions-container"></div>
+  <button type="button" id="btnSubmitExam" class="btn-submit" onclick="gradeExam()">Nộp Bài Thi</button>
+
+</div>
+
+<script>
+// ================= NGÂN HÀNG CÂU HỎI PHONG PHÚ (ĐÃ BỎ NHÃN ĐỘ KHÓ) =================
+const bankMCQ = {
+  c1: [
+    { q: "Đối tượng nghiên cứu chính của bộ môn Hóa học là", a: "B", opts: {A: "chuyển động cơ học của các thiên thể vũ trụ.", B: "chất và sự biến đổi của chất.", C: "quy luật di truyền và biến dị ở sinh vật.", D: "hiện tượng quang điện và sóng vô tuyến."}},
+    { q: "Nội dung nào sau đây KHÔNG thuộc đối tượng nghiên cứu của hóa học?", a: "C", opts: {A: "Thành phần và cấu trúc của chất.", B: "Tính chất vật lí và hóa học của chất.", C: "Sự co giãn vì nhiệt của đường ray xe lửa.", D: "Ứng dụng và sự điều chế các hợp chất hữu cơ."}},
+    { q: "Hóa học đóng vai trò quan trọng trong đời sống vì nghiên cứu về", a: "A", opts: {A: "cách thức sản xuất năng lượng, vật liệu và dược phẩm.", B: "quỹ đạo chuyển động của các vệ tinh nhân tạo.", C: "chu kì sinh sản của các loài sinh vật biển.", D: "quá trình hình thành các mảng kiến tạo địa chất."}}
+  ],
+  c2: [
+    { q: "Hạt mang điện tích âm trong cấu trúc nguyên tử là", a: "A", opts: {A: "electron.", B: "proton.", C: "neutron.", D: "positron."}},
+    { q: "Hầu hết hạt nhân nguyên tử của các nguyên tố đều được cấu tạo từ", a: "D", opts: {A: "proton và electron.", B: "electron và neutron.", C: "chỉ có hạt proton.", D: "proton và neutron."}},
+    { q: "Trong nguyên tử, loại hạt nào có khối lượng vô cùng nhỏ bé so với các hạt còn lại?", a: "B", opts: {A: "Proton.", B: "Electron.", C: "Neutron.", D: "Hạt nhân."}}
+  ],
+  c3: [
+    { q: "Số hiệu nguyên tử (kí hiệu Z) của một nguyên tố hóa học cho biết", a: "C", opts: {A: "số hạt neutron trong hạt nhân.", B: "khối lượng nguyên tử.", C: "số hạt proton trong hạt nhân nguyên tử.", D: "tổng số electron và neutron."}},
+    { q: "Số khối (A) của hạt nhân nguyên tử được tính theo công thức nào sau đây?", a: "A", opts: {A: "A = Z + N.", B: "A = Z - N.", C: "A = 2Z + N.", D: "A = Z + 2N."}},
+    { q: "Kí hiệu nguyên tử <sup>A</sup><sub>Z</sub>X cho biết thông tin nào sau đây?", a: "C", opts: {A: "Số proton Z và số neutron A.", B: "Số neutron Z và số khối A.", C: "Số hiệu nguyên tử Z và số khối A.", D: "Điện tích hạt nhân A và số electron Z."}}
+  ],
+  c4: [
+    { q: "Đồng vị là các nguyên tử của cùng một nguyên tố hóa học, có cùng", a: "B", opts: {A: "số neutron nhưng khác số proton.", B: "số proton nhưng khác số neutron.", C: "số khối A nhưng khác số proton.", D: "khối lượng tuyệt đối."}},
+    { q: "Số orbital nguyên tử (AO) có trong phân lớp electron p là", a: "C", opts: {A: "1.", B: "2.", C: "3.", D: "5."}},
+    { q: "Số orbital nguyên tử (AO) có trong phân lớp electron s là", a: "A", opts: {A: "1.", B: "2.", C: "3.", D: "4."}}
+  ],
+  c5: [
+    { q: "Số electron tối đa có thể chứa trong lớp electron thứ 3 (lớp M, n = 3) là", a: "C", opts: {A: "8.", B: "9.", C: "18.", D: "32."}},
+    { q: "Cấu hình electron nguyên tử của nguyên tố Calcium (Z = 20) là", a: "D", opts: {A: "1s<sup>2</sup> 2s<sup>2</sup> 2p<sup>6</sup> 3s<sup>2</sup> 3p<sup>6</sup> 3d<sup>2</sup>.", B: "1s<sup>2</sup> 2s<sup>2</sup> 2p<sup>6</sup> 3s<sup>2</sup> 3d<sup>8</sup>.", C: "[Ne] 3s<sup>2</sup> 3p<sup>6</sup> 4s<sup>2</sup>.", D: "1s<sup>2</sup> 2s<sup>2</sup> 2p<sup>6</sup> 3s<sup>2</sup> 3p<sup>6</sup> 4s<sup>2</sup>."}},
+    { q: "Lớp electron thứ hai (lớp L, n = 2) có tối đa bao nhiêu phân lớp electron?", a: "B", opts: {A: "1 phân lớp.", B: "2 phân lớp.", C: "3 phân lớp.", D: "4 phân lớp."}}
+  ],
+  c6: [
+    { q: "Nguyên tắc nào sau đây KHÔNG đúng khi sắp xếp các nguyên tố trong bảng tuần hoàn?", a: "A", opts: {A: "Sắp xếp theo chiều tăng dần khối lượng nguyên tử.", B: "Sắp xếp theo chiều tăng dần điện tích hạt nhân.", C: "Các nguyên tố có cùng số lớp electron xếp vào một chu kì.", D: "Các nguyên tố có cùng số electron hóa trị xếp vào một nhóm."}},
+    { q: "Nguyên tố Sulfur (S) có số hiệu nguyên tử Z = 16. Vị trí của S trong bảng tuần hoàn là", a: "B", opts: {A: "ô 16, chu kì 2, nhóm VIA.", B: "ô 16, chu kì 3, nhóm VIA.", C: "ô 16, chu kì 3, nhóm IVA.", D: "ô 16, chu kì 4, nhóm IIA."}},
+    { q: "Bảng tuần hoàn các nguyên tố hóa học hiện nay gồm có bao nhiêu chu kì và bao nhiêu cột?", a: "D", opts: {A: "7 chu kì và 16 cột.", B: "8 chu kì và 18 cột.", C: "6 chu kì và 18 cột.", D: "7 chu kì và 18 cột."}}
+  ],
+  c7: [
+    { q: "Trong một chu kì, theo chiều tăng của điện tích hạt nhân, bán kính nguyên tử nhìn chung", a: "B", opts: {A: "tăng dần.", B: "giảm dần.", C: "không thay đổi.", D: "biến đổi không tuần hoàn."}},
+    { q: "Theo quy luật tuần hoàn, tính phi kim của các nguyên tố trong nhóm VIIA từ trên xuống dưới", a: "B", opts: {A: "tăng dần.", B: "giảm dần.", C: "không đổi.", D: "vừa tăng vừa giảm."}},
+    { q: "Độ âm điện của các nguyên tử trong một chu kì theo chiều tăng dần của điện tích hạt nhân biến đổi như thế nào?", a: "A", opts: {A: "Tăng dần.", B: "Giảm dần.", C: "Không đổi.", D: "Tùy thuộc vào khối lượng."}}
+  ],
+  c8: [
+    { q: "Cho các nguyên tố: <sub>11</sub>Na, <sub>12</sub>Mg, <sub>13</sub>Al. Thứ tự sắp xếp theo chiều tăng dần tính kim loại là", a: "C", opts: {A: "Na < Mg < Al.", B: "Al < Na < Mg.", C: "Al < Mg < Na.", D: "Mg < Al < Na."}},
+    { q: "Oxide cao nhất của nguyên tố R (thuộc nhóm VA) có công thức tổng quát là", a: "D", opts: {A: "RO<sub>2</sub>.", B: "RO<sub>3</sub>.", C: "R<sub>2</sub>O<sub>3</sub>.", D: "R<sub>2</sub>O<sub>5</sub>."}},
+    { q: "Hydroxide nào sau đây có tính base mạnh nhất trong chu kì 3?", a: "A", opts: {A: "NaOH.", B: "Mg(OH)<sub>2</sub>.", C: "Al(OH)<sub>3</sub>.", D: "Si(OH)<sub>4</sub>."}}
+  ],
+  c9: [
+    { q: "Nguyên tử nguyên tố X có tổng số electron ở các phân lớp p là 11. Vị trí của X trong bảng tuần hoàn là", a: "B", opts: {A: "chu kì 3, nhóm VA.", B: "chu kì 3, nhóm VIIA.", C: "chu kì 2, nhóm VIIA.", D: "chu kì 3, nhóm VIA."}},
+    { q: "Một cation R<sup>2+</sup> có cấu hình electron ở phân lớp ngoài cùng là 2p<sup>6</sup>. Số hiệu nguyên tử của nguyên tố R là", a: "C", opts: {A: "10.", B: "11.", C: "12.", D: "14."}},
+    { q: "Tổng số hạt mang điện trong ion <sup>27</sup><sub>13</sub>Al<sup>3+</sup> là", a: "A", opts: {A: "23.", B: "26.", C: "13.", D: "10."}}
+  ],
+  c10: [
+    { q: "Cho biết nguyên tố X thuộc chu kì 3, nhóm VIA. Hydroxide cao nhất của X có công thức và tính chất là", a: "A", opts: {A: "H<sub>2</sub>XO<sub>4</sub>, là acid mạnh.", B: "X(OH)<sub>6</sub>, là base mạnh.", C: "H<sub>3</sub>XO<sub>4</sub>, là acid trung bình.", D: "HXO<sub>3</sub>, là acid yếu."}},
+    { q: "Nguyên tử của nguyên tố M có cấu hình electron là [Ar] 4s<sup>1</sup>. Số electron độc thân của M ở trạng thái cơ bản là", a: "A", opts: {A: "1.", B: "2.", C: "3.", D: "0."}},
+    { q: "Nguyên tố Y có phân lớp electron ngoài cùng là 3p<sup>4</sup>. Số electron hóa trị của nguyên tố Y là", a: "D", opts: {A: "4.", B: "2.", C: "5.", D: "6."}}
+  ],
+  c11: [
+    { q: "Anion X<sup>2-</sup> có tổng số hạt mang điện là 34. Số electron độc thân của nguyên tử X ở trạng thái cơ bản là", a: "B", opts: {A: "1.", B: "2.", C: "3.", D: "4."}},
+    { q: "Cation M<sup>3+</sup> có phân lớp electron cuối cùng là 3d<sup>5</sup>. Cấu hình electron của nguyên tử M ở trạng thái cơ bản là", a: "C", opts: {A: "[Ar] 3d<sup>8</sup>.", B: "[Ar] 3d<sup>5</sup> 4s<sup>2</sup> 4p<sup>1</sup>.", C: "[Ar] 3d<sup>6</sup> 4s<sup>2</sup>.", D: "[Ar] 3d<sup>7</sup> 4s<sup>1</sup>."}},
+    { q: "Ion X<sup>-</sup> có cấu hình electron phân lớp ngoài cùng là 3p<sup>6</sup>. Nguyên tử X có số electron độc thân ở trạng thái cơ bản là", a: "A", opts: {A: "1.", B: "0.", C: "3.", D: "5."}}
+  ],
+  c12: [
+    { q: "Hai nguyên tố X, Y thuộc hai nhóm A kế tiếp nhau và ở hai chu kì liên tiếp trong bảng tuần hoàn. Tổng số hạt proton của X và Y là 23 (biết Z<sub>X</sub> < Z<sub>Y</sub>). Nhận định nào sau đây là ĐÚNG?", a: "C", opts: {A: "X và Y đều là kim loại mạnh.", B: "Bán kính nguyên tử của X lớn hơn Y.", C: "Oxide cao nhất của Y là một acidic oxide.", D: "Y có độ âm điện nhỏ hơn X."}},
+    { q: "Hợp chất ion MX<sub>2</sub> có tổng số hạt cơ bản (p, n, e) là 140, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 44. Số khối của cation M<sup>2+</sup> nhiều hơn của anion X<sup>-</sup> là 23. Số hiệu nguyên tử của nguyên tố M là", a: "A", opts: {A: "20.", B: "12.", C: "26.", D: "19."}},
+    { q: "Hai nguyên tố A và B đứng kế tiếp nhau trong cùng một chu kì của bảng tuần hoàn, có tổng số đơn vị điện tích hạt nhân là 25. Vị trí của A và B trong bảng tuần hoàn là", a: "B", opts: {A: "Chu kì 2, nhóm IA và IIA.", B: "Chu kì 3, nhóm IIA và IIIA.", C: "Chu kì 3, nhóm IA và IIA.", D: "Chu kì 4, nhóm IA và IIA."}}
+  ]
+};
+
+const bankTF1 = [
+  {
+    passage: "Xét ba nguyên tử X (Z = 11), Y (Z = 12) và T (Z = 17). Dựa trên cấu tạo nguyên tử và cấu hình electron, xét tính đúng/sai của các nhận định:",
+    items: [
+      { text: "X là nguyên tố kim loại điển hình do có 1 electron ở lớp ngoài cùng.", ans: "Đ" },
+      { text: "Cấu hình electron của ion Y<sup>2+</sup> là 1s<sup>2</sup> 2s<sup>2</sup> 2p<sup>6</sup>.", ans: "Đ" },
+      { text: "Cả ion X<sup>+</sup> và ion T<sup>-</sup> đều có cấu hình electron của khí hiếm neon (Ne).", ans: "S" },
+      { text: "Hợp chất tạo thành giữa Y và T có công thức phân tử là YT<sub>2</sub> và mang liên kết ion.", ans: "Đ" }
+    ]
+  },
+  {
+    passage: "Cho các nguyên tử A (Z = 8), B (Z = 15), C (Z = 16) và D (Z = 20). Dựa vào cấu hình electron và quy luật biến đổi tuần hoàn:",
+    items: [
+      { text: "Nguyên tử A và C đều có 6 electron hóa trị và thuộc cùng một nhóm A.", ans: "Đ" },
+      { text: "Số electron độc thân của nguyên tử B (Phosphorus) ở trạng thái cơ bản là 3.", ans: "Đ" },
+      { text: "Bán kính nguyên tử của ion D<sup>2+</sup> lớn hơn bán kính của nguyên tử D.", ans: "S" },
+      { text: "Tính phi kim của C mạnh hơn tính phi kim của A do C có nhiều electron hơn.", ans: "S" }
+    ]
+  },
+  {
+    passage: "Nghiên cứu về nguyên tử Potassium (K, Z = 19) và Argon (Ar, Z = 18), nhóm học sinh đưa ra các nhận định:",
+    items: [
+      { text: "Argon là nguyên tố khí hiếm có lớp vỏ ngoài cùng bão hòa 8 electron.", ans: "Đ" },
+      { text: "Potassium có electron cuối cùng được điền vào phân lớp 3d.", ans: "S" },
+      { text: "Ion K<sup>+</sup> có cùng số electron với nguyên tử khí hiếm Argon.", ans: "Đ" },
+      { text: "Bán kính ion K<sup>+</sup> lớn hơn bán kính của nguyên tử Argon.", ans: "S" }
+    ]
+  }
+];
+
+const bankTF2 = [
+  {
+    passage: "Cho các nguyên tố thuộc chu kì 3: Na (Z = 11), Mg (Z = 12), Al (Z = 13), Si (Z = 14) và Cl (Z = 17). Nghiên cứu về tính chất hóa học và độ âm điện:",
+    items: [
+      { text: "Tất cả các nguyên tố trên đều có 3 lớp electron trong nguyên tử.", ans: "Đ" },
+      { text: "Theo chiều tăng điện tích hạt nhân, bán kính nguyên tử giảm dần: Na > Mg > Al > Si > Cl.", ans: "Đ" },
+      { text: "Al(OH)<sub>3</sub> là một hydroxide có tính base mạnh hơn Mg(OH)<sub>2</sub>.", ans: "S" },
+      { text: "Oxide cao nhất của Cl là Cl<sub>2</sub>O<sub>7</sub>, đây là acidic oxide ứng với acid mạnh nhất là HClO<sub>4</sub>.", ans: "Đ" }
+    ]
+  },
+  {
+    passage: "Xét các nguyên tố nhóm Halogen (nhóm VIIA): F (Z = 9), Cl (Z = 17), Br (Z = 35) và I (Z = 53):",
+    items: [
+      { text: "Nguyên tử của tất cả các halogen đều có 7 electron ở lớp ngoài cùng.", ans: "Đ" },
+      { text: "Fluorine (F) là nguyên tố có độ âm điện lớn nhất trong toàn bộ bảng tuần hoàn.", ans: "Đ" },
+      { text: "Theo chiều từ F đến I, tính phi kim tăng dần do bán kính nguyên tử tăng.", ans: "S" },
+      { text: "Đơn chất Halogen có tính oxi hóa giảm dần từ Fluorine đến Iodine.", ans: "Đ" }
+    ]
+  },
+  {
+    passage: "Khảo sát tính chất các nguyên tố nhóm IA (nhóm kim loại kiềm): Li (Z = 3), Na (Z = 11), K (Z = 19), Rb (Z = 37):",
+    items: [
+      { text: "Các kim loại kiềm đều có 1 electron ở lớp ngoài cùng.", ans: "Đ" },
+      { text: "Theo chiều tăng điện tích hạt nhân, nhiệt độ nóng chảy của các kim loại kiềm tăng dần.", ans: "S" },
+      { text: "Hydroxide tương ứng của các kim loại kiềm là các base mạnh (kiềm).", ans: "Đ" },
+      { text: "Tính kim loại của Na mạnh hơn tính kim loại của K.", ans: "S" }
+    ]
+  }
+];
+
+// ================= PHẦN III: 10 CÂU TRẢ LỜI NGẮN (3 CÂU CUỐI CỰC KÌ KHÓ) =================
+const bankSA = {
+  c15: [
+    { q: "Số orbital nguyên tử (AO) có trong lớp electron thứ 3 (lớp M, n = 3) là bao nhiêu?", ans: ["9"] },
+    { q: "Lớp electron thứ 2 (lớp L, n = 2) có tối đa bao nhiêu electron?", ans: ["8"] },
+    { q: "Số phân lớp electron có trong lớp thứ 4 (lớp N, n = 4) là bao nhiêu?", ans: ["4"] }
+  ],
+  c16: [
+    { q: "Nguyên tử Sodium (Na) có Z = 11. Số electron ở lớp ngoài cùng của nguyên tử Na là bao nhiêu?", ans: ["1"] },
+    { q: "Nguyên tử Chlorine (Cl) có Z = 17. Số electron ở lớp vỏ ngoài cùng của nguyên tử Cl là bao nhiêu?", ans: ["7"] },
+    { q: "Nguyên tử Magnesium (Mg) có Z = 12. Số electron ở lớp ngoài cùng của nguyên tử Mg là bao nhiêu?", ans: ["2"] }
+  ],
+  c17: [
+    { q: "Nguyên tử Phosphorus (Z = 15) có bao nhiêu electron độc thân ở trạng thái cơ bản?", ans: ["3"] },
+    { q: "Nguyên tử Chromium (Z = 24) có bao nhiêu electron độc thân ở trạng thái cơ bản?", ans: ["6"] },
+    { q: "Nguyên tử Carbon (Z = 6) có bao nhiêu electron độc thân ở trạng thái cơ bản?", ans: ["2"] }
+  ],
+  c18: [
+    { q: "Nguyên tố Potassium (K) có số hiệu nguyên tử Z = 19. Potassium thuộc chu kì mấy trong bảng tuần hoàn?", ans: ["4"] },
+    { q: "Nguyên tố Sulfur (S) có Z = 16. Sulfur thuộc chu kì mấy trong bảng tuần hoàn?", ans: ["3"] },
+    { q: "Nguyên tố Bromine (Br) có Z = 35. Bromine thuộc chu kì mấy trong bảng tuần hoàn?", ans: ["4"] }
+  ],
+  c19: [
+    { q: "Nguyên tố Sulfur (Z = 16) thuộc nhóm nào trong bảng tuần hoàn? (Điền chữ số La Mã và chữ A, ví dụ: VIA)", ans: ["VIA", "6A"] },
+    { q: "Nguyên tố Calcium (Z = 20) thuộc nhóm nào trong bảng tuần hoàn? (Điền chữ số La Mã và chữ A, ví dụ: IIA)", ans: ["IIA", "2A"] },
+    { q: "Nguyên tố Aluminium (Z = 13) thuộc nhóm nào trong bảng tuần hoàn? (Điền chữ số La Mã và chữ A, ví dụ: IIIA)", ans: ["IIIA", "3A"] }
+  ],
+  c20: [
+    { q: "Hóa trị cao nhất của nguyên tố Sulfur (Z = 16) trong hợp chất với oxygen (oxide cao nhất) bằng bao nhiêu?", ans: ["6", "VI"] },
+    { q: "Hóa trị cao nhất của nguyên tố Phosphorus (Z = 15) trong hợp chất với oxygen bằng bao nhiêu?", ans: ["5", "V"] },
+    { q: "Hóa trị cao nhất của nguyên tố Chlorine (Z = 17) trong hợp chất oxide cao nhất bằng bao nhiêu?", ans: ["7", "VII"] }
+  ],
+  c21: [
+    { q: "Tổng số hạt cơ bản (p, n, e) trong nguyên tử X là 40, trong đó số hạt mang điện nhiều hơn không mang điện là 12. Xác định số hiệu nguyên tử (Z) của X?", ans: ["13"] },
+    { q: "Tổng số hạt proton, neutron, electron của ion X<sup>2+</sup> là 80, trong đó số hạt mang điện nhiều hơn không mang điện là 20. Số khối A của nguyên tử X bằng bao nhiêu?", ans: ["56"] },
+    { q: "Tổng số hạt cơ bản (p, n, e) trong nguyên tử Y là 34, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 10. Số khối A của nguyên tử Y là bao nhiêu?", ans: ["23"] }
+  ],
+
+  // CÂU 22: CỰC KÌ KHÓ (OXIDE CAO NHẤT & HỢP CHẤT KHÍ VỚI HYDROGEN)
+  c22: [
+    { q: "Nguyên tố R tạo được hợp chất khí với hydrogen có công thức RH<sub>3</sub>. Trong oxide cao nhất của R, oxygen chiếm 56,34% về khối lượng. Xác định số hiệu nguyên tử (Z) của nguyên tố R?", ans: ["15"] },
+    { q: "Nguyên tố X thuộc nhóm A. Oxide cao nhất của X có công thức XO<sub>3</sub>. Trong hợp chất khí của X với hydrogen, hydrogen chiếm 5,88% về khối lượng. Xác định số hiệu nguyên tử (Z) của nguyên tố X?", ans: ["16"] },
+    { q: "Nguyên tố R thuộc nhóm VIA. Trong oxide cao nhất của R, oxygen chiếm 60% về khối lượng. Trong hợp chất khí của R với hydrogen, R chiếm bao nhiêu phần trăm về khối lượng? (Làm tròn 2 chữ số thập phân, ví dụ: 94.12)", ans: ["94.12", "94,12", "94.12%"] }
+  ],
+
+  // CÂU 23: CỰC KÌ KHÓ (ĐỒNG VỊ NÂNG CAO TRONG TINH THỂ VÀ HỢP CHẤT PHỨC TẠP)
+  c23: [
+    { q: "Trong tự nhiên, đồng (Cu) có hai đồng vị bền là <sup>63</sup>Cu và <sup>65</sup>Cu, nguyên tử khối trung bình của Cu là 63,54. Cho S = 32, O = 16, H = 1. Tính phần trăm theo khối lượng của đồng vị <sup>63</sup>Cu trong tinh thể copper(II) sulfate pentahydrate (CuSO<sub>4</sub>·5H<sub>2</sub>O)? (Làm tròn 2 chữ số thập phân, ví dụ: 18.43)", ans: ["18.43", "18,43", "18.43%"] },
+    { q: "Trong tự nhiên, chlorine có 2 đồng vị bền <sup>35</sup>Cl và <sup>37</sup>Cl, nguyên tử khối trung bình là 35,5. Cho Ba = 137, O = 16. Tính phần trăm theo khối lượng của đồng vị <sup>37</sup>Cl có trong muối barium chlorate Ba(ClO<sub>3</sub>)<sub>2</sub>? (Làm tròn 2 chữ số thập phân, ví dụ: 6.09)", ans: ["6.09", "6,09", "6.09%"] },
+    { q: "Nguyên tố Bromine có 2 đồng vị <sup>79</sup>Br và <sup>81</sup>Br. Biết <sup>79</sup>Br chiếm 54,5% số nguyên tử. Cho Na = 23. Tính phần trăm theo khối lượng của đồng vị <sup>81</sup>Br trong hợp chất sodium bromide (NaBr)? (Làm tròn 2 chữ số thập phân, ví dụ: 35.81)", ans: ["35.81", "35,81", "35.81%"] }
+  ],
+
+  // CÂU 24: CỰC KÌ KHÓ (HỆ PHƯƠNG TRÌNH HẠT PHÂN TỬ VÀ ANION ĐA NGUYÊN TỬ)
+  c24: [
+    { q: "Hợp chất A có công thức M<sub>2</sub>X. Tổng số hạt proton, neutron, electron trong phân tử M<sub>2</sub>X là 140 hạt, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 44 hạt. Số hạt mang điện trong nguyên tử M nhiều hơn trong nguyên tử X là 22 hạt. Xác định số hiệu nguyên tử (Z) của nguyên tố kim loại M?", ans: ["19"] },
+    { q: "Phân tử XY<sub>3</sub> có tổng số hạt cơ bản (p, n, e) là 196 hạt, trong đó số hạt mang điện nhiều hơn số hạt không mang điện là 60 hạt. Số hạt mang điện trong nguyên tử Y nhiều hơn trong nguyên tử X là 8 hạt. Xác định số hiệu nguyên tử (Z) của nguyên tố X?", ans: ["13"] },
+    { q: "Anion XY<sub>3</sub><sup>2-</sup> có tổng số hạt mang điện là 62 hạt. Số hạt mang điện trong nguyên tử Y nhiều hơn trong nguyên tử X là 4 hạt. Xác định số hiệu nguyên tử (Z) của nguyên tố X?", ans: ["6"] }
+  ]
+};
+
+// ================= BIẾN TRẠNG THÁI =================
+let curMCQ = [];
+let curTF = [];
+let curSA = [];
+let userAnsMCQ = {};
+let userAnsTF = {};
+let timerInt = null;
+let secondsLeft = 45 * 60;
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function startExam() {
+  let nameVal = document.getElementById("txtName").value.trim();
+  let classVal = document.getElementById("txtClass").value.trim();
+
+  if (!nameVal) nameVal = "Học sinh tự do";
+  if (!classVal) classVal = "10A";
+
+  document.getElementById("dspName").innerText = nameVal;
+  document.getElementById("dspClass").innerText = classVal;
+  document.getElementById("lblExamCode").innerText = Math.floor(100 + Math.random() * 900);
+
+  document.getElementById("modal-login").style.display = "none";
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  generateExam();
+  startCountdown();
+}
+
+document.getElementById("txtName").addEventListener("keyup", function(e) {
+  if (e.key === "Enter") startExam();
+});
+
+// Render toàn bộ đề thi liền mạch 24 câu (KHÔNG CÒN NHÃN PHÂN LOẠI)
+function generateExam() {
+  curMCQ = [
+    pickRandom(bankMCQ.c1), pickRandom(bankMCQ.c2), pickRandom(bankMCQ.c3), pickRandom(bankMCQ.c4),
+    pickRandom(bankMCQ.c5), pickRandom(bankMCQ.c6), pickRandom(bankMCQ.c7), pickRandom(bankMCQ.c8),
+    pickRandom(bankMCQ.c9), pickRandom(bankMCQ.c10), pickRandom(bankMCQ.c11), pickRandom(bankMCQ.c12)
+  ];
+  curTF = [pickRandom(bankTF1), pickRandom(bankTF2)];
+  curSA = [
+    pickRandom(bankSA.c15), pickRandom(bankSA.c16), pickRandom(bankSA.c17), pickRandom(bankSA.c18),
+    pickRandom(bankSA.c19), pickRandom(bankSA.c20), pickRandom(bankSA.c21), pickRandom(bankSA.c22),
+    pickRandom(bankSA.c23), pickRandom(bankSA.c24)
+  ];
+
+  userAnsMCQ = {};
+  userAnsTF = {};
+
+  const box = document.getElementById("questions-container");
+  box.innerHTML = "";
+
+  // 1. PHẦN I: Câu 1 -> 12 (3,0 điểm)
+  const p1Hdr = document.createElement("div");
+  p1Hdr.className = "section-hdr";
+  p1Hdr.innerHTML = "PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn (Thí sinh trả lời từ Câu 1 đến Câu 12 - 3,0 điểm)";
+  box.appendChild(p1Hdr);
+
+  curMCQ.forEach((item, idx) => {
+    const qNum = idx + 1;
+    const div = document.createElement("div");
+    div.className = "q-box";
+
+    let optsHtml = "";
+    ['A', 'B', 'C', 'D'].forEach(l => {
+      optsHtml += `
+        <div class="mcq-item" id="opt-${idx}-${l}" onclick="chooseMCQ(${idx}, '${l}')">
+          <b>${l}.</b> <span>${item.opts[l]}</span>
+        </div>
+      `;
+    });
+
+    div.innerHTML = `
+      <div class="q-title"><b>Câu ${qNum}:</b> ${item.q}</div>
+      <div class="mcq-options">${optsHtml}</div>
+    `;
+    box.appendChild(div);
+  });
+
+  // 2. PHẦN II: Câu 13, 14 (2,0 điểm)
+  const p2Hdr = document.createElement("div");
+  p2Hdr.className = "section-hdr";
+  p2Hdr.innerHTML = "PHẦN II. Câu trắc nghiệm đúng sai (Thí sinh trả lời Câu 13 và Câu 14 - 2,0 điểm)";
+  box.appendChild(p2Hdr);
+
+  const subLetters = ['a', 'b', 'c', 'd'];
+  curTF.forEach((item, tIdx) => {
+    const qNum = 12 + tIdx + 1; // 13 & 14
+    const div = document.createElement("div");
+    div.className = "q-box";
+
+    let rowsHtml = "";
+    item.items.forEach((sub, sIdx) => {
+      rowsHtml += `
+        <tr id="row-tf-${tIdx}-${sIdx}">
+          <td><b>${subLetters[sIdx]})</b> ${sub.text}</td>
+          <td style="width: 140px; text-align: center;">
+            <div class="tf-btn-group">
+              <button type="button" class="tf-btn" id="btn-tf-${tIdx}-${sIdx}-D" onclick="chooseTF(${tIdx}, ${sIdx}, 'Đ')">Đúng</button>
+              <button type="button" class="tf-btn" id="btn-tf-${tIdx}-${sIdx}-S" onclick="chooseTF(${tIdx}, ${sIdx}, 'Sai')">Sai</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    div.innerHTML = `
+      <div class="q-title"><b>Câu ${qNum}:</b> Đọc đoạn thông tin và trả lời các lệnh hỏi:</div>
+      <div class="passage-box">${item.passage}</div>
+      <table class="tf-table">
+        <thead>
+          <tr><th>Lệnh hỏi</th><th>Chọn đáp án</th></tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    `;
+    box.appendChild(div);
+  });
+
+  // 3. PHẦN III: Câu 15 -> 24 (5,0 điểm - 10 câu trả lời ngắn)
+  const p3Hdr = document.createElement("div");
+  p3Hdr.className = "section-hdr";
+  p3Hdr.innerHTML = "PHẦN III. Câu trắc nghiệm trả lời ngắn (Thí sinh trả lời từ Câu 15 đến Câu 24 - 5,0 điểm)";
+  box.appendChild(p3Hdr);
+
+  curSA.forEach((item, sIdx) => {
+    const qNum = 14 + sIdx + 1; // 15 -> 24
+    const div = document.createElement("div");
+    div.className = "q-box";
+    div.innerHTML = `
+      <div class="q-title"><b>Câu ${qNum}:</b> ${item.q}</div>
+      <div>Đáp án: <input type="text" class="sa-input" id="sa-val-${sIdx}" placeholder="Nhập đáp số..."></div>
+      <div class="sa-ans-show" id="sa-show-${sIdx}"></div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function chooseMCQ(qIdx, letter) {
+  userAnsMCQ[qIdx] = letter;
+  ['A', 'B', 'C', 'D'].forEach(l => {
+    document.getElementById(`opt-${qIdx}-${l}`).classList.remove("selected");
+  });
+  document.getElementById(`opt-${qIdx}-${letter}`).classList.add("selected");
+}
+
+function chooseTF(tIdx, sIdx, val) {
+  if (!userAnsTF[tIdx]) userAnsTF[tIdx] = {};
+  userAnsTF[tIdx][sIdx] = val;
+
+  const btnD = document.getElementById(`btn-tf-${tIdx}-${sIdx}-D`);
+  const btnS = document.getElementById(`btn-tf-${tIdx}-${sIdx}-S`);
+
+  if (val === 'Đ') {
+    btnD.className = "tf-btn active-d";
+    btnS.className = "tf-btn";
+  } else {
+    btnS.className = "tf-btn active-s";
+    btnD.className = "tf-btn";
+  }
+}
+
+function startCountdown() {
+  const dsp = document.getElementById("dspTimer");
+  timerInt = setInterval(() => {
+    let m = Math.floor(secondsLeft / 60);
+    let s = secondsLeft % 60;
+    dsp.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    if (secondsLeft <= 0) {
+      clearInterval(timerInt);
+      alert("Hết giờ làm bài! Hệ thống tự động chấm điểm bài làm của bạn.");
+      gradeExam();
+    }
+    secondsLeft--;
+  }, 1000);
+}
+
+// Chấm điểm 100% tự động
+function gradeExam() {
+  if (timerInt) clearInterval(timerInt);
+
+  let p1Score = 0;
+  let p2Score = 0;
+  let p3Score = 0;
+
+  // 1. Chấm Phần I (12 câu x 0.25đ = 3.0đ)
+  curMCQ.forEach((item, idx) => {
+    ['A', 'B', 'C', 'D'].forEach(l => {
+      const el = document.getElementById(`opt-${idx}-${l}`);
+      el.style.borderColor = "#cbd5e1";
+      el.style.background = "#f8fafc";
+    });
+
+    const correctEl = document.getElementById(`opt-${idx}-${item.a}`);
+    correctEl.style.background = "var(--bg-correct)";
+    correctEl.style.borderColor = "var(--border-correct)";
+
+    const userPick = userAnsMCQ[idx];
+    if (userPick) {
+      if (userPick === item.a) {
+        p1Score += 0.25;
+      } else {
+        const wrongEl = document.getElementById(`opt-${idx}-${userPick}`);
+        wrongEl.style.background = "var(--bg-wrong)";
+        wrongEl.style.borderColor = "var(--border-wrong)";
+      }
+    }
+  });
+
+  // 2. Chấm Phần II (8 ý x 0.25đ = 2.0đ)
+  curTF.forEach((item, tIdx) => {
+    item.items.forEach((sub, sIdx) => {
+      const row = document.getElementById(`row-tf-${tIdx}-${sIdx}`);
+      const userPick = userAnsTF[tIdx] ? userAnsTF[tIdx][sIdx] : null;
+      const correctVal = sub.ans === "Đ" ? "Đ" : "Sai";
+
+      if (userPick === correctVal) {
+        p2Score += 0.25;
+        row.style.background = "var(--bg-correct)";
+      } else {
+        row.style.background = "var(--bg-wrong)";
+      }
+    });
+  });
+
+  // 3. Chấm Phần III (10 câu x 0.5đ = 5.0đ)
+  curSA.forEach((item, sIdx) => {
+    let val = document.getElementById(`sa-val-${sIdx}`).value.trim().toLowerCase();
+    const show = document.getElementById(`sa-show-${sIdx}`);
+    show.style.display = "block";
+
+    val = val.replace(',', '.').replace('%', '').trim();
+    const isMatch = item.ans.some(a => a.toLowerCase().replace(',', '.').replace('%', '').trim() === val);
+
+    if (isMatch && val !== "") {
+      p3Score += 0.5;
+      show.innerHTML = `<span style="color:var(--border-correct)">✓ Đúng (+0,5đ)</span>`;
+      document.getElementById(`sa-val-${sIdx}`).style.borderColor = "var(--border-correct)";
+    } else {
+      show.innerHTML = `<span style="color:var(--border-wrong)">✗ Chưa đúng! Đáp án chuẩn: <b>${item.ans[0]}</b></span>`;
+      document.getElementById(`sa-val-${sIdx}`).style.borderColor = "var(--border-wrong)";
+    }
+  });
+
+  const total = (p1Score + p2Score + p3Score).toFixed(2);
+
+  const board = document.getElementById("score-board");
+  board.style.display = "block";
+  document.getElementById("dspScore").innerText = `${total} / 10.0 ĐIỂM`;
+  document.getElementById("dspDetail").innerHTML = `
+    Phần I (Nhiều lựa chọn): <b>${p1Score.toFixed(2)}/3.0đ</b> &nbsp;|&nbsp; 
+    Phần II (Đúng/Sai): <b>${p2Score.toFixed(2)}/2.0đ</b> &nbsp;|&nbsp; 
+    Phần III (Trả lời ngắn): <b>${p3Score.toFixed(2)}/5.0đ</b><br>
+    <i>(Hệ thống tự động chấm điểm theo barem chính thức)</i>
+  `;
+
+  const cmt = document.getElementById("dspComment");
+  if (total >= 9.0) {
+    cmt.innerHTML = `<span style="color:#15803d">XẾP LOẠI XUẤT SẮC:</span> Kiến thức cực kỳ vững vàng, giải quyết trọn vẹn cả 3 bài toán khó nhất đề thi!`;
+  } else if (total >= 8.0) {
+    cmt.innerHTML = `<span style="color:#0369a1">XẾP LOẠI GIỎI:</span> Rất tốt! Đạt điểm số cao ở phần trắc nghiệm và trả lời ngắn. Hãy rèn thêm dạng bài hệ hạt phân tử để đạt điểm 10.`;
+  } else if (total >= 6.5) {
+    cmt.innerHTML = `<span style="color:#0284c7">XẾP LOẠI KHÁ:</span> Nắm tốt kiến thức cơ bản. Cần chú ý cẩn thận hơn ở các câu tính toán đồng vị và oxide cao nhất.`;
+  } else if (total >= 5.0) {
+    cmt.innerHTML = `<span style="color:#d97706">XẾP LOẠI TRUNG BÌNH:</span> Cần củng cố lại cách viết cấu hình electron và xác định vị trí trong bảng tuần hoàn.`;
+  } else {
+    cmt.innerHTML = `<span style="color:#dc2626">CẦN CỐ GẮNG NHIỀU:</span> Chưa nắm vững các khái niệm cơ bản. Em hãy nhấn "Tạo Đề Mới Ngẫu Nhiên" để luyện tập lại nhé!`;
+  }
+
+  document.getElementById("btnSubmitExam").style.display = "none";
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function makeNewExam() {
+  document.getElementById("score-board").style.display = "none";
+  document.getElementById("btnSubmitExam").style.display = "block";
+  secondsLeft = 45 * 60;
+  generateExam();
+  startCountdown();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
